@@ -1,9 +1,10 @@
-# Fluent::Plugin::Forward::Aws
+# Fluent::Plugin::Forward-AWS
 
-TODO: Write a gem description
+Still under development. Please come back later:-)
+
+Fluentd plugin to foward log through Amazon Web Service.
 
 ## Installation
-
 Add this line to your application's Gemfile:
 
     gem 'fluent-plugin-forward-aws'
