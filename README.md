@@ -35,8 +35,9 @@ AWS permission
 s3:GetObject
 sqs:
 
-## Add SQS as SNS subscriber
-http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html
+## How to configure SQS as SNS subscriber
+In short, change SQS's access policy to accept "SendMessage" from your SNS ARN, And add SQS ARN to SNS subscribers.  
+For more detail, check [amazon official document](http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html)
 
 ## Contributing
 
