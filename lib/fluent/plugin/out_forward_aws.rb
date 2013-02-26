@@ -16,6 +16,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   config_param :aws_sns_endpoint, :string, :default => nil
   config_param :aws_sns_topic_arn, :string, :default => nil
   config_param :aws_sns_skiptest, :bool, :default => false
+  config_param :aws_sns_emailsubject, :string, :default => "SNS Message"
 
   def initialize
     super
@@ -60,7 +61,10 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
     unless(@aws_sns_skiptest)
       init_aws_sns_topic()
       begin
-        @topic.publish(JSON.pretty_generate({"type" => "ping"}), :subject => "SNS Message")
+        notification = {
+          "type" => "ping"
+        }
+        @topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
       rescue
         raise Fluent::ConfigError.new("Cannot post notification to SNS. Need sns:Publish permission for resource " + @aws_sns_topic_arn)
       end
@@ -84,7 +88,11 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
 
   def write(chunk)
     #Add UUID to avoid name conflict
-    s3path = "#{@channel}/#{chunk.key}/#{SecureRandom.uuid}.gz"
+    #Current version supports only msgpack + gz, but add suffix for future extentions
+    format = "msgpack"
+    compresssion = "gzip"
+    compresssion_suffix = "gz"
+    s3path = "#{@channel}/#{chunk.key}/#{SecureRandom.uuid}.#{format}.#{compresssion_suffix}"
     
     # Create temp gzip file
     tmpFile = Tempfile.new("forward-aws-")
@@ -93,7 +101,15 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
       chunk.write_to(writer)
       writer.close
       @bucket.objects[s3path].write(Pathname.new(tmpFile.path), :content_type => 'application/x-gzip')
-      @topic.publish(JSON.pretty_generate({"type" => "out","bucketname" => @aws_s3_bucketname,"channel"=>@channel,"path" => s3path}), :subject => "SNS Message")
+      notification = {
+        "type"         => "out",
+        "channel"      => @channel,
+        "bucketname"   => @aws_s3_bucketname,
+        "path"         => s3path,
+        "format"       => format,
+        "compresssion" => compresssion
+      }
+      @topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
     ensure
       writer.close rescue nil
       tmp.close(true) rescue nil
