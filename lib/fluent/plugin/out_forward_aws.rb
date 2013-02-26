@@ -90,9 +90,9 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
     #Add UUID to avoid name conflict
     #Current version supports only msgpack + gz, but add suffix for future extentions
     format = "msgpack"
-    compresssion = "gzip"
-    compresssion_suffix = "gz"
-    s3path = "#{@channel}/#{chunk.key}/#{SecureRandom.uuid}.#{format}.#{compresssion_suffix}"
+    compression = "gzip"
+    compression_suffix = "gz"
+    s3path = "#{@channel}/#{chunk.key}/#{SecureRandom.uuid}.#{format}.#{compression_suffix}"
     
     # Create temp gzip file
     tmpFile = Tempfile.new("forward-aws-")
@@ -102,12 +102,12 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
       writer.close
       @bucket.objects[s3path].write(Pathname.new(tmpFile.path), :content_type => 'application/x-gzip')
       notification = {
-        "type"         => "out",
-        "channel"      => @channel,
-        "bucketname"   => @aws_s3_bucketname,
-        "path"         => s3path,
-        "format"       => format,
-        "compresssion" => compresssion
+        "type"        => "out",
+        "channel"     => @channel,
+        "bucketname"  => @aws_s3_bucketname,
+        "path"        => s3path,
+        "format"      => format,
+        "compression" => compression
       }
       @topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
     ensure
