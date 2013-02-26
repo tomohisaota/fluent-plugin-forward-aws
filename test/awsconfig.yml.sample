@@ -1,0 +1,6 @@
+aws_access_key_id: 
+aws_secret_access_key: 
+aws_s3_endpoint: 
+aws_s3_bucketname: 
+aws_sns_endpoint: 
+aws_sns_topic_arn: 
