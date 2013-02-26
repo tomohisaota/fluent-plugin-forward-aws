@@ -2,9 +2,8 @@
 
 Still under development. Please come back later:-)
 
-Forward AWS plugin forwards log through Amazon Web Service.
-
-By using AWS infrastructure, log forwarding host and log processing host can be totally isolated.
+Forward AWS plugin forwards log through Amazon Web Service.  
+See [wiki](https://github.com/tomohisaota/fluent-plugin-forward-aws/wiki) for more detail.
 
 ## Installation
 
