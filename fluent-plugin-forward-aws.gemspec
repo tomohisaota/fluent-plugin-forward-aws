@@ -7,15 +7,16 @@ Gem::Specification.new do |gem|
   gem.version       = "0.0.1"
   gem.authors       = ["Tomohisa Ota"]
   gem.email         = ["tomohisa.ota+github@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = "Fluentd Forward Plugin using Amazon Web Service"
+  gem.summary       = gem.description
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
+  gem.files.reject! { |fn| fn.include? "doc/" }
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_development_dependency "fluentd"
   gem.add_runtime_dependency "fluentd"
+  gem.add_runtime_dependency "aws-sdk", "~> 1.8.2"
 end

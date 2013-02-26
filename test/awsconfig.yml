@@ -1,0 +1,6 @@
+aws_access_key_id: AKIAIRD6NAAVMUBLGPDA
+aws_secret_access_key: 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
+aws_s3_endpoint: s3-ap-northeast-1.amazonaws.com
+aws_s3_bucketname: fluentd-aws-forward-test
+aws_sns_endpoint: sns.ap-northeast-1.amazonaws.com
+aws_sns_topic_arn: arn:aws:sns:ap-northeast-1:511822331118:fluentd-aws-forward-test
