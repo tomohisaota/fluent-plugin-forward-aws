@@ -28,7 +28,6 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
 
   def configure(conf)
     super
-    @path = conf['path']
     unless /[\w]+/ =~ @channel
       raise Fluent::ConfigError.new("channel is invalid. Exp=[\w]+")
     end
@@ -61,7 +60,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
     unless(@aws_sns_skiptest)
       init_aws_sns_topic()
       begin
-        @topic.publish('', :subject => "SNS Message", :email =>JSON.pretty_generate({"type" => "ping"}))
+        @topic.publish(JSON.pretty_generate({"type" => "ping"}), :subject => "SNS Message")
       rescue
         raise Fluent::ConfigError.new("Cannot post notification to SNS. Need sns:Publish permission for resource " + @aws_sns_topic_arn)
       end
@@ -94,7 +93,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
       chunk.write_to(writer)
       writer.close
       @bucket.objects[s3path].write(Pathname.new(tmpFile.path), :content_type => 'application/x-gzip')
-      @topic.publish('', :subject => "SNS Message", :email =>JSON.pretty_generate({"type" => "out","bucketname" => @aws_s3_bucketname,"channel"=>@channel,"path" => s3path}))
+      @topic.publish(JSON.pretty_generate({"type" => "out","bucketname" => @aws_s3_bucketname,"channel"=>@channel,"path" => s3path}), :subject => "SNS Message")
     ensure
       writer.close rescue nil
       tmp.close(true) rescue nil
