@@ -35,6 +35,9 @@ AWS permission
 s3:GetObject
 sqs:
 
+## Add SQS as SNS subscriber
+http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html
+
 ## Contributing
 
 1. Fork it
