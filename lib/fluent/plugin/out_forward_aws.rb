@@ -29,6 +29,9 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   def configure(conf)
     super
     @path = conf['path']
+    unless /[\w]+/ =~ @channel
+      raise Fluent::ConfigError.new("channel is invalid. Exp=[\w]+")
+    end
     unless @aws_access_key_id
       raise Fluent::ConfigError.new("aws_access_key_id is required")
     end
