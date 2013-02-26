@@ -2,24 +2,39 @@
 
 Still under development. Please come back later:-)
 
-Fluentd plugin to foward log through Amazon Web Service.
+Forward AWS plugin forwards log through Amazon Web Service.
+
+By using AWS infrastructure, log forwarding host and log processing host can be totally isolated.
 
 ## Installation
-Add this line to your application's Gemfile:
 
-    gem 'fluent-plugin-forward-aws'
+Ruby gem is not yet supported...
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Use ruby gem as :
 
     $ gem install fluent-plugin-forward-aws
 
-## Usage
+Or, if you're using td-client, you can call td-client's gem
 
-TODO: Write usage instructions here
+    $ /usr/lib64/fluent/ruby/bin/gem install fluent-plugin-forward-aws
+
+## Configuration
+
+###out plugin
+Put log on S3, and send notification through SNS.
+
+[aws_key_id (required)] AWS access key id.
+
+
+AWS permission
+s3:PutObject
+sns:Publish
+
+###in plugin
+Listen to notification on SQS, and read log data from S3.
+AWS permission
+s3:GetObject
+sqs:
 
 ## Contributing
 
@@ -28,3 +43,8 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Copyright
+
+Copyright:: Copyright (c) 2013 Tomohisa Ota
+License::   Apache License, Version 2.0
