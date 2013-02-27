@@ -66,7 +66,8 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
         notification = {
           "type" => "ping"
         }
-        @topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
+        topic = @sns.topics[@aws_sns_topic_arn]
+        topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
       rescue
         raise Fluent::ConfigError.new("Cannot post notification to SNS. Need sns:Publish permission for resource " + @aws_sns_topic_arn)
       end
@@ -111,7 +112,8 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
         "format"      => format,
         "compression" => compression
       }
-      @topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
+      topic = @sns.topics[@aws_sns_topic_arn]
+      topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
     ensure
       writer.close rescue nil
       tmp.close(true) rescue nil
@@ -133,13 +135,12 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   end
 
   def init_aws_sns_topic
-    unless @topic
+    unless @sns
       options = {}
       options[:access_key_id]     = @aws_access_key_id
       options[:secret_access_key] = @aws_secret_access_key
       options[:sns_endpoint]      = @aws_sns_endpoint
-      sns = AWS::SNS.new(options)
-      @topic = sns.topics[@aws_sns_topic_arn]
+      @sns = AWS::SNS.new(options)
     end
   end
 
