@@ -67,6 +67,7 @@ Use "default" channel for all the log data
   time_slice_wait       1m
   utc
   time_slice_format     %Y/%m/%d/%H/%M
+  flush_at_shutdown     true
 </match>
 ```
 
@@ -92,6 +93,7 @@ Use tag as channel
     time_slice_wait       1m
     utc
     time_slice_format     %Y/%m/%d/%H/%M
+    flush_at_shutdown     true
   </template>
 </match>
 ```
