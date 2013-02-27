@@ -54,7 +54,7 @@ For more detail, check [amazon official document](http://docs.aws.amazon.com/sns
 Use "default" channel for all the log data
 ```
 <match **>
-  type forward-aws
+  type forward_aws
   aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
   aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -65,7 +65,7 @@ Use "default" channel for all the log data
   aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
 
   buffer_type           file
-  buffer_path           /var/log/td-agent/buffer/forward-aws
+  buffer_path           /var/log/td-agent/buffer/forward_aws
   time_slice_wait       1m
   utc
   time_slice_format     %Y/%m/%d/%H/%M
@@ -77,7 +77,7 @@ Use tag as channel
 ```
 <match **>
   type forest
-  subtype forward-aws
+  subtype forward_aws
   <template>
     channel               ${tag}
     aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
@@ -90,7 +90,7 @@ Use tag as channel
     aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
 
     buffer_type           file
-    buffer_path           /var/log/td-agent/buffer/forward-aws-${tag}
+    buffer_path           /var/log/td-agent/buffer/forward_aws-${tag}
     time_slice_wait       1m
     utc
     time_slice_format     %Y/%m/%d/%H/%M
@@ -108,7 +108,7 @@ Use tag as channel
 ### Basic configuration
 ```
 <source>
-  type forward-aws
+  type forward_aws
   aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
   aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

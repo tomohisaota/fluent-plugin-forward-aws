@@ -1,5 +1,5 @@
 class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
-  Fluent::Plugin.register_output('forward-aws', self)
+  Fluent::Plugin.register_output('forward_aws', self)
 
   # config_param :hoge, :string, :default => 'hoge'
 

@@ -1,5 +1,5 @@
 class Fluent::ForwardAWSInput < Fluent::Input
-  Fluent::Plugin.register_input('forward-aws', self)
+  Fluent::Plugin.register_input('forward_aws', self)
 
   # config_param :hoge, :string, :default => 'hoge'
 
