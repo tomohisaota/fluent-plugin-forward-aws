@@ -18,29 +18,108 @@ Or, if you're using td-client, you can call td-client's gem
 
     $ /usr/lib64/fluent/ruby/bin/gem install fluent-plugin-forward-aws
 
-## Configuration
+## AWS Configuration
+### IAM
+It is recommended to create IAM user for logging.  
+Create IAM user with credential, and memorize following parameters
++ aws_access_key_id
++ aws_secret_access_key
 
-### out plugin for forwarder
-Put log on S3, and send notification through SNS.
+### S3
+Create bucket, and memorize following parameters
++ aws_s3_endpoint
++ aws_s3_bucketname
 
-[aws_key_id (required)] AWS access key id.
+### SNS
+Create SNS Topic, and memorize following parameters
++ aws_sns_endpoint
++ aws_sns_topic_arn 
 
-Required AWS permission 
-*s3:PutObject
-*sns:Publish
-gitg
-### in plugin for receiver
-Listen to notification on SQS, and read log data from S3.
+### SQS
+Create SQS Queue, subscribe to SNS, and memorize following parameters
++ aws_sqs_endpoint
++ aws_sqs_queue_url 
 
-Required AWS permission 
-*s3:GetObject
-*sqs:ReceiveMessage
-*sqs:DeleteMessage
-
-### How to configure SQS as SNS subscriber
+#### How to configure SQS as SNS subscriber
 In short, change SQS's access policy to accept "SendMessage" from your SNS ARN, And add SQS ARN to SNS subscribers. 
 You can do the above step in one shot from SQS Management Console.  
 For more detail, check [amazon official document](http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html)
+
+## Out Plugin Configuration
+
+###Required AWS permission 
++ s3:PutObject
++ sns:Publish
+
+### Basic configuration
+Use "default" channel for all the log data
+```
+<match filtered.**>
+  type forward-aws
+  aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
+  aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+  aws_s3_endpoint       s3-ap-northeast-1.amazonaws.com
+  aws_s3_bucketname     XXXXXXXXXXXXXXXXXXXX
+
+  aws_sns_endpoint      sns.ap-northeast-1.amazonaws.com
+  aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
+
+  buffer_type           file
+  buffer_path           /var/log/td-agent/buffer/forward-aws
+  time_slice_wait       1m
+  utc
+  time_slice_format     %Y/%m/%d/%H/%M
+</match>
+```
+
+### Advanced configuration using forest plugin
+Use tag as channel
+```
+<match filtered.**>
+  type forest
+  subtype forward-aws
+  <template>
+    channel               ${tag}
+    aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
+    aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    aws_s3_endpoint       s3-ap-northeast-1.amazonaws.com
+    aws_s3_bucketname     XXXXXXXXXXXXXXXXXXXX
+
+    aws_sns_endpoint      sns.ap-northeast-1.amazonaws.com
+    aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
+
+    buffer_type           file
+    buffer_path           /var/log/td-agent/buffer/forward-aws-${tag}
+    time_slice_wait       1m
+    utc
+    time_slice_format     %Y/%m/%d/%H/%M
+  </template>
+</match>
+```
+
+## In Plugin Configuration
+
+###Required AWS permission 
++ s3:GetObject
++ sqs:ReceiveMessage
++ sqs:DeleteMessage
+
+### Basic configuration
+```
+<source>
+  type forward-aws
+  aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
+  aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+  aws_s3_endpoint       s3-ap-northeast-1.amazonaws.com
+  aws_s3_bucketname     XXXXXXXXXXXXXXXXXXXX
+  
+  aws_sqs_endpoint      sqs.ap-northeast-1.amazonaws.com
+  aws_sqs_queue_url     https://sqs.ap-northeast-1.amazonaws.com/XXXXXXXXXXXXXXXXXXXX
+</source>
+```
 
 ## Contributing
 

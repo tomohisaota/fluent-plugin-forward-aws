@@ -19,16 +19,16 @@ class Fluent::ForwardAWSInput < Fluent::Input
   
   config_param :aws_s3_endpoint, :string, :default => nil
   config_param :aws_s3_bucketname, :string, :default => nil
-  config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :aws_s3_skiptest, :bool, :default => false
   
   config_param :aws_sqs_endpoint, :string, :default => nil
   config_param :aws_sqs_queue_url, :string, :default => nil
   config_param :aws_sqs_skiptest, :bool, :default => false
   
+  # Not documented parameters. Subject to change in future release
   config_param :aws_sqs_process_interval, :integer, :default => 1
   config_param :aws_sqs_monitor_interval, :integer, :default => 10
-  
+  config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :start_thread, :bool, :default => true
   
   def configure(conf)

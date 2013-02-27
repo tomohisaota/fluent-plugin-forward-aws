@@ -10,12 +10,14 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   
   config_param :aws_s3_endpoint, :string, :default => nil
   config_param :aws_s3_bucketname, :string, :default => nil
-  config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :aws_s3_skiptest, :bool, :default => false
   
   config_param :aws_sns_endpoint, :string, :default => nil
   config_param :aws_sns_topic_arn, :string, :default => nil
   config_param :aws_sns_skiptest, :bool, :default => false
+
+  # Not documented parameters. Subject to change in future release
+  config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :aws_sns_emailsubject, :string, :default => "SNS Message"
 
   def initialize
