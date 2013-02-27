@@ -7,8 +7,6 @@ Please see [wiki](https://github.com/tomohisaota/fluent-plugin-forward-aws/wiki/
 
 ## Installation
 
-Ruby gem is not yet supported...
-
 Use ruby gem as :
 
     $ gem install fluent-plugin-forward-aws
