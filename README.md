@@ -106,9 +106,28 @@ Use tag as channel
 + sqs:DeleteMessage
 
 ### Basic configuration
+Default config is to listen to "default" channel.
 ```
 <source>
   type forward_aws
+  aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
+  aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+  aws_s3_endpoint       s3-ap-northeast-1.amazonaws.com
+  aws_s3_bucketname     XXXXXXXXXXXXXXXXXXXX
+  
+  aws_sqs_endpoint      sqs.ap-northeast-1.amazonaws.com
+  aws_sqs_queue_url     https://sqs.ap-northeast-1.amazonaws.com/XXXXXXXXXXXXXXXXXXXX
+</source>
+```
+
+### Advanced configuration
+Use regex to filter channel
+```
+<source>
+  type forward_aws
+  channel .*
+  channelEnableRegEx true
   aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
   aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
