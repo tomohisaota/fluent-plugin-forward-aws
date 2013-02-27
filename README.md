@@ -54,7 +54,7 @@ For more detail, check [amazon official document](http://docs.aws.amazon.com/sns
 ### Basic configuration
 Use "default" channel for all the log data
 ```
-<match filtered.**>
+<match **>
   type forward-aws
   aws_access_key_id     XXXXXXXXXXXXXXXXXXXX
   aws_secret_access_key XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -76,7 +76,7 @@ Use "default" channel for all the log data
 ### Advanced configuration using forest plugin
 Use tag as channel
 ```
-<match filtered.**>
+<match **>
   type forest
   subtype forward-aws
   <template>
@@ -120,6 +120,24 @@ Use tag as channel
   aws_sqs_queue_url     https://sqs.ap-northeast-1.amazonaws.com/XXXXXXXXXXXXXXXXXXXX
 </source>
 ```
+
+## Tips
+### How to delete buffer objects on S3
+Forward-AWS plugin do not delete buffer objects on S3.  
+Use [S3's lifecycle management](http://docs.aws.amazon.com/AmazonS3/latest/dev/manage-lifecycle-using-console.html) to automatically archive or delete old buffer objects.
+
+### How to use buffer objects as raw input
+Each buffer object is msgpack stream object with gzip compression.
+
+### Want to forward log per minute, but have archive per day
+You can configure forward per minute, and setup another receiver for archiving.
+
+### Skipping test at startup
+You can control startup test by following optional parameters. Default value is false
++ aws_s3_skiptest
++ aws_sns_skiptest
++ aws_sqs_skiptest
+
 
 ## Contributing
 
