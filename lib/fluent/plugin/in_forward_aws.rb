@@ -13,6 +13,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   end
 
   config_param :channel, :string, :default => "default"
+  config_param :channelEnableRegEx, :bool, :default => false
 
   config_param :aws_access_key_id, :string, :default => nil
   config_param :aws_secret_access_key, :string, :default => nil
@@ -33,7 +34,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   
   def configure(conf)
     super
-    unless /[\w]+/ =~ @channel
+    if /^\s*$/ =~ @channel
       raise Fluent::ConfigError.new("channel is invalid. Exp=[\w]+")
     end
     unless @aws_access_key_id
@@ -111,10 +112,16 @@ class Fluent::ForwardAWSInput < Fluent::Input
       return true
     end
     if msg["type"] == "out"
+      # Silently ignore non matching logs
       if msg["bucketname"] != @aws_s3_bucketname
-        # Cannot process logs in other buckets
-        return false
+        return true
       end
+      if(@channelEnableRegEx)
+        return true unless Regexp.new(@channel).match(msg["channel"])
+      else
+        return true unless @channel == msg["channel"]
+      end
+      
       tmpFile = Tempfile.new("forward-aws-")
       begin
         #Download log file to temporary file
