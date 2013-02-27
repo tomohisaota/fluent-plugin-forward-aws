@@ -1,10 +1,9 @@
 # Fluent::Plugin::Forward-AWS
 
-Still under development. Please come back later:-)
-
 Forward-AWS plugin forwards log through Amazon Web Service.  
 It uses S3 as log storage, and SNS+SQS for notification.  
-See [wiki](https://github.com/tomohisaota/fluent-plugin-forward-aws/wiki) for more detail.
+
+Please see [wiki](https://github.com/tomohisaota/fluent-plugin-forward-aws/wiki/Forward-AWS-plugin-concept) to understand the concept.
 
 ## Installation
 
@@ -140,6 +139,8 @@ You can control startup test by following optional parameters. Default value is 
 
 
 ## Contributing
+I am newbie for both of Ruby and Fluentd.  
+Feel free to send me pull request.  
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
