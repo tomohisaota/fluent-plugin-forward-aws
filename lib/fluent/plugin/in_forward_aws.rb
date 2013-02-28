@@ -1,8 +1,9 @@
 class Fluent::ForwardAWSInput < Fluent::Input
   Fluent::Plugin.register_input('forward_aws', self)
-
-  # config_param :hoge, :string, :default => 'hoge'
-
+  
+  require_relative "forward_aws_util"
+  include ForwardAWSUtil
+    
   def initialize
     super
     require 'aws-sdk'
@@ -25,6 +26,9 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :aws_sqs_endpoint, :string, :default => nil
   config_param :aws_sqs_queue_url, :string, :default => nil
   config_param :aws_sqs_skiptest, :bool, :default => false
+  
+  config_param :add_tag_prefix, :string, :default => nil
+  config_param :remove_tag_prefix, :string, :default => nil
   
   # Not documented parameters. Subject to change in future release
   config_param :aws_sqs_process_interval, :integer, :default => 1
@@ -135,6 +139,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
           streamUnpacker.feed(reader.read())
           streamUnpacker.each {|event|
             (tag, time, record) = event
+            tag = ForwardAWSUtil.filtertag(tag,@add_tag_prefix,@remove_tag_prefix)
             Fluent::Engine.emit(tag,time,record)
           }
         }

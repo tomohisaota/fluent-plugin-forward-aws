@@ -72,6 +72,28 @@ class ForwardAWSOutputTest < Test::Unit::TestCase
     d.expect_format ["test",time,{"a"=>2}].to_msgpack
     d.run
   end
+  
+  def test_format_addprefixtest
+    d = create_driver(DUMMYCONFIG + "add_tag_prefix addprefixtest")
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    d.emit({"a"=>1}, time)
+    d.emit({"a"=>2}, time)
+
+    d.expect_format ["addprefixtest.test",time,{"a"=>1}].to_msgpack
+    d.expect_format ["addprefixtest.test",time,{"a"=>2}].to_msgpack
+    d.run
+  end
+
+  def test_format_removeprefixtest
+    d = create_driver(DUMMYCONFIG + "remove_tag_prefix test")
+    time = Time.parse("2011-01-02 13:14:15 UTC").to_i
+    d.emit({"a"=>1}, time)
+    d.emit({"a"=>2}, time)
+
+    d.expect_format ["",time,{"a"=>1}].to_msgpack
+    d.expect_format ["",time,{"a"=>2}].to_msgpack
+    d.run
+  end  
 
   def test_check_aws_s3
     unless(@CONFIG)
