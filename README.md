@@ -84,7 +84,7 @@ Skip SNS Related test at startup
 + sns:Publish
 
 ### Basic configuration
-Use "default" channel for all the log data
+Use "default" channel for all the log data.  
 ```
 <match **>
   type forward_aws
@@ -97,17 +97,17 @@ Use "default" channel for all the log data
   aws_sns_endpoint      sns.ap-northeast-1.amazonaws.com
   aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
 
-  buffer_type           file
+  # Time Sliced Output options
   buffer_path           /var/log/td-agent/buffer/forward_aws
   time_slice_wait       1m
-  utc
   time_slice_format     %Y/%m/%d/%H/%M
+  utc
   flush_at_shutdown     true
 </match>
 ```
 
 ### Advanced configuration using forest plugin
-Use tag as channel
+Use tag as forward-AWS channel
 ```
 <match **>
   type forest
@@ -123,11 +123,11 @@ Use tag as channel
     aws_sns_endpoint      sns.ap-northeast-1.amazonaws.com
     aws_sns_topic_arn     arn:aws:sns:ap-northeast-1:XXXXXXXXXXXXXXXXXXXX
 
-    buffer_type           file
+    # Time Sliced Output options
     buffer_path           /var/log/td-agent/buffer/forward_aws-${tag}
     time_slice_wait       1m
-    utc
     time_slice_format     %Y/%m/%d/%H/%M
+    utc
     flush_at_shutdown     true
   </template>
 </match>
