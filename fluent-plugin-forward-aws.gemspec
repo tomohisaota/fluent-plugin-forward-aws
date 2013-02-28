@@ -4,12 +4,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-forward-aws"
-  gem.version       = "0.1.2"
+  gem.version       = "0.1.3"
   gem.authors       = ["Tomohisa Ota"]
   gem.email         = ["tomohisa.ota+github@gmail.com"]
-  gem.description   = "Fluentd Forward Plugin using Amazon Web Service"
+  gem.description   = "Fluentd In/Out plugin to forward log through AWS(S3/SNS/SQS)"
   gem.summary       = gem.description
-  gem.homepage      = ""
+  gem.homepage      = "http://github.com/tomohisaota/fluent-plugin-forward-aws"
 
   gem.files         = `git ls-files`.split($/)
   gem.files.reject! { |fn| fn.include? "doc/" }
