@@ -42,7 +42,42 @@ In short, change SQS's access policy to accept "SendMessage" from your SNS ARN, 
 You can do the above step in one shot from SQS Management Console.  
 For more detail, check [amazon official document](http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html)
 
+## Common Configuration
+### Parameters
++ **aws_access_key_id** (required)  
+AWS Acccess Key ID
+
++ **aws_secret_access_key** (required)  
+AWS Secket Access Key
+
++ **aws_s3_endpoint** (required)  
+[s3 Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region) for your bucket
+
++ **aws_s3_bucketname** (required)  
+S3 Bucketname
+
++ **aws_s3_skiptest** (optional, default = false)  
+Skip S3 Related test at startup
+
++ **add_tag_prefix** (optional)  
+Add specified prefix to tag before processing log
+
++ **remove_tag_prefix** (optional)  
+Remove specified prefix from tag before processing log
+
++ **channel** (optional, default = "default")  
+Tag that Forward-AWS plugin uses for grouping logs.
+
 ## Out Plugin Configuration
+### Parameters
++ **aws_sns_endpoint** (required)  
+[SNS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sns_region) for your topic
+
++ **aws_sns_topic_arn** (required)  
+SNS Topic ARN
+
++ **aws_sns_skiptest** (optional, default = false)  
+Skip SNS Related test at startup
 
 ###Required AWS permission 
 + s3:PutObject
@@ -99,6 +134,18 @@ Use tag as channel
 ```
 
 ## In Plugin Configuration
+### Parameters
++ **aws_sqs_endpoint** (required)  
+[SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
+
++ **aws_sqs_queue_url** (required)  
+SQS Queue URL (not ARN)
+
++ **aws_sqs_skiptest** (optional, default = false)  
+Skip SQS Related test at startup
+
++ **channelEnableRegEx** (optional, default = false)
+Enabled Regular Expression for channel value.
 
 ###Required AWS permission 
 + s3:GetObject
