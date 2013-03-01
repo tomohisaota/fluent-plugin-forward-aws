@@ -70,7 +70,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
     unless(@aws_sqs_skiptest)
       init_aws_sqs_queue()
       begin
-        @queue.receive_message() do |msg|
+        @queue.receive_message() do |notification|
         end
       rescue => e
         raise Fluent::ConfigError.new("Cannot fetch queue from SQS. Need sqs:ReceiveMessage sqs:DeleteMessage permission for resource " + @aws_sqs_queue_url)
@@ -90,10 +90,16 @@ class Fluent::ForwardAWSInput < Fluent::Input
   def run
     @running = true
     while true
-      msg = @queue.receive_message()
-      if msg
-        if(process(JSON.parse(msg.as_sns_message.body)))
-          msg.delete()
+      $log.debug "Polling SQS"
+      notificationRaw = @queue.receive_message()
+      if notificationRaw
+        notification = JSON.parse(notificationRaw.as_sns_message.body)
+        $log.debug "Received Notification#{notification}"
+        if(process(notification))
+          notificationRaw.delete()
+          $log.debug "Deleted processed notification #{notification}"
+        else
+          $log.error "Could not process notification, pending... #{notification}"
         end
         sleep @aws_sqs_process_interval
         @locker.synchronize do
@@ -110,26 +116,33 @@ class Fluent::ForwardAWSInput < Fluent::Input
     puts e 
   end
 
-  def process(msg)
-    if msg["type"] == "ping"
+  def process(notification)
+    if notification["type"] == "ping"
       # Ignore ping message
       return true
     end
-    if msg["type"] == "out"
+    if notification["type"] == "out"
       # Silently ignore non matching logs
-      if msg["bucketname"] != @aws_s3_bucketname
+      if notification["bucketname"] != @aws_s3_bucketname
+        $log.debug "Bucketname does not match. Ignoring"
         return true
       end
       if(@channelEnableRegEx)
-        return true unless Regexp.new(@channel).match(msg["channel"])
+        unless Regexp.new(@channel).match(notification["channel"])
+          $log.debug "Channel RegEx does not match. Ignoring"
+          return true
+        end
       else
-        return true unless @channel == msg["channel"]
+        unless @channel == notification["channel"]
+          $log.debug "Channel does not match. Ignoring"
+          return true
+        end
       end
-      
       tmpFile = Tempfile.new("forward-aws-")
       begin
         #Download log file to temporary file
-        @bucket.objects[msg["path"]].read do |chunk|
+        $log.debug "Download log object from S3 bucket #{@aws_s3_bucketname} path #{notification["path"]}"
+        @bucket.objects[notification["path"]].read do |chunk|
           tmpFile.write(chunk)
         end
         tmpFile.close()
