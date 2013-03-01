@@ -37,7 +37,7 @@ Create SQS Queue, subscribe to SNS, and memorize following parameters
 + aws_sqs_endpoint
 + aws_sqs_queue_url 
 
-#### How to configure SQS as SNS subscriber
+### How to configure SQS as SNS subscriber
 In short, change SQS's access policy to accept "SendMessage" from your SNS ARN, And add SQS ARN to SNS subscribers. 
 You can do the above step in one shot from SQS Management Console.  
 For more detail, check [amazon official document](http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html)
@@ -127,6 +127,7 @@ aws_sqs_endpoint      | string (required)               | [SQS Endpoint](http://
 aws_sqs_queue_url     | string (required)               | SQS Queue URL (not ARN)
 aws_sqs_skiptest      | bool (default = false)          | Skip SQS Related test at startup
 channelEnableRegEx    | bool (default = false)          | Enabled Regular Expression when checking channel
+dry_run               | bool (default = false)          | Do not delete notification after processing
 
 ###Required AWS permission 
 + s3:GetObject

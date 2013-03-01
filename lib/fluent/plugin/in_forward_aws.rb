@@ -30,6 +30,8 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :add_tag_prefix, :string, :default => nil
   config_param :remove_tag_prefix, :string, :default => nil
   
+  config_param :dry_run, :bool, :default => false
+  
   # Not documented parameters. Subject to change in future release
   config_param :aws_sqs_process_interval, :integer, :default => 1
   config_param :aws_sqs_monitor_interval, :integer, :default => 10
@@ -96,8 +98,12 @@ class Fluent::ForwardAWSInput < Fluent::Input
         notification = JSON.parse(notificationRaw.as_sns_message.body)
         $log.debug "Received Notification#{notification}"
         if(process(notification))
-          notificationRaw.delete()
-          $log.debug "Deleted processed notification #{notification}"
+          if dry_run
+            $log.info "Notification processed in dry-run mode #{notification}"
+          else
+            notificationRaw.delete()
+            $log.debug "Deleted processed notification #{notification}"
+          end
         else
           $log.error "Could not process notification, pending... #{notification}"
         end
