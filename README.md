@@ -37,47 +37,32 @@ Create SQS Queue, subscribe to SNS, and memorize following parameters
 + aws_sqs_endpoint
 + aws_sqs_queue_url 
 
-#### How to configure SQS as SNS subscriber
+### How to configure SQS as SNS subscriber
 In short, change SQS's access policy to accept "SendMessage" from your SNS ARN, And add SQS ARN to SNS subscribers. 
 You can do the above step in one shot from SQS Management Console.  
 For more detail, check [amazon official document](http://docs.aws.amazon.com/sns/latest/gsg/SendMessageToSQS.html)
 
 ## Common Configuration
 ### Parameters
-+ **aws_access_key_id** (required)  
-AWS Acccess Key ID
-
-+ **aws_secret_access_key** (required)  
-AWS Secket Access Key
-
-+ **aws_s3_endpoint** (required)  
-[s3 Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region) for your bucket
-
-+ **aws_s3_bucketname** (required)  
-S3 Bucketname
-
-+ **aws_s3_skiptest** (optional, default = false)  
-Skip S3 Related test at startup
-
-+ **add_tag_prefix** (optional)  
-Add specified prefix to tag before processing log
-
-+ **remove_tag_prefix** (optional)  
-Remove specified prefix from tag before processing log
-
-+ **channel** (optional, default = "default")  
-Tag that Forward-AWS plugin uses for grouping logs.
+ name                 | type                            | description
+----------------------|---------------------------------|---------------------------
+type                  | string (required)               | type of plugin should be **forward_aws**
+aws_access_key_id     | string (required)               |  AWS Acccess Key ID
+aws_secret_access_key | string (required)               | AWS Secket Access Key
+aws_s3_endpoint       | string (required)               | [s3 Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region) for your bucket
+aws_s3_bucketname     | string (required)               | S3 Bucketname
+aws_s3_skiptest       | bool (default = false)          | Skip S3 Related test at startup
+add_tag_prefix        | string (default = nil)          | Add specified prefix to tag before processing log
+remove_tag_prefix     | string (default = nil)          | Remove specified prefix from tag before processing log
+channel               | string (default = "default")    | Tag that Forward-AWS plugin uses for grouping logs.
 
 ## Out Plugin Configuration
 ### Parameters
-+ **aws_sns_endpoint** (required)  
-[SNS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sns_region) for your topic
-
-+ **aws_sns_topic_arn** (required)  
-SNS Topic ARN
-
-+ **aws_sns_skiptest** (optional, default = false)  
-Skip SNS Related test at startup
+ name                 | type                            | description
+----------------------|---------------------------------|---------------------------
+aws_sns_endpoint      | string (required)               | [SNS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sns_region) for your topic
+aws_sns_topic_arn     | string (required)               | SNS Topic ARN
+aws_sns_skiptest      | bool (default = false)          | Skip SNS Related test at startup
 
 ###Required AWS permission 
 + s3:PutObject
@@ -135,17 +120,14 @@ Use tag as forward-AWS channel
 
 ## In Plugin Configuration
 ### Parameters
-+ **aws_sqs_endpoint** (required)  
-[SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
 
-+ **aws_sqs_queue_url** (required)  
-SQS Queue URL (not ARN)
-
-+ **aws_sqs_skiptest** (optional, default = false)  
-Skip SQS Related test at startup
-
-+ **channelEnableRegEx** (optional, default = false)
-Enabled Regular Expression for channel value.
+ name                 | type                            | description
+----------------------|---------------------------------|---------------------------
+aws_sqs_endpoint      | string (required)               | [SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
+aws_sqs_queue_url     | string (required)               | SQS Queue URL (not ARN)
+aws_sqs_skiptest      | bool (default = false)          | Skip SQS Related test at startup
+channelEnableRegEx    | bool (default = false)          | Enabled Regular Expression when checking channel
+dry_run               | bool (default = false)          | Do not delete notification after processing
 
 ###Required AWS permission 
 + s3:GetObject

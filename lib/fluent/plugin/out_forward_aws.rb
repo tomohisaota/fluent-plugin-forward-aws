@@ -108,6 +108,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
     begin
       chunk.write_to(writer)
       writer.close
+      $log.debug "Upload log object to S3 bucket #{@aws_s3_bucketname} path #{s3path}"
       @bucket.objects[s3path].write(Pathname.new(tmpFile.path), :content_type => 'application/x-gzip')
       notification = {
         "type"        => "out",
@@ -118,6 +119,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
         "compression" => compression
       }
       topic = @sns.topics[@aws_sns_topic_arn]
+      $log.debug "Posting notification #{notification}"
       topic.publish(JSON.pretty_generate(notification), :subject => @aws_sns_emailsubject)
     ensure
       writer.close rescue nil
