@@ -33,10 +33,12 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :dry_run, :bool, :default => false
   
   # Not documented parameters. Subject to change in future release
-  config_param :aws_sqs_process_interval, :integer, :default => 1
+  config_param :aws_sqs_process_interval, :integer, :default => 0
   config_param :aws_sqs_monitor_interval, :integer, :default => 10
+  config_param :aws_sqs_limit,            :integer, :default => 10
   config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :start_thread, :bool, :default => true
+  
   
   def configure(conf)
     super
@@ -93,21 +95,26 @@ class Fluent::ForwardAWSInput < Fluent::Input
     @running = true
     while true
       $log.debug "Polling SQS"
-      notificationRaw = @queue.receive_message()
-      if notificationRaw
-        notification = JSON.parse(notificationRaw.as_sns_message.body)
-        $log.debug "Received Notification#{notification}"
-        if(process(notification))
-          if dry_run
-            $log.info "Notification processed in dry-run mode #{notification}"
+      notificationRaws = @queue.receive_message({:limit => @aws_sqs_limit})
+      if(notificationRaws && !notificationRaws.instance_of?(Array))
+        notificationRaws = [notificationRaws]
+      end
+      if notificationRaws && notificationRaws.size != 0
+        notificationRaws.each{ |notificationRaw|
+          notification = JSON.parse(notificationRaw.as_sns_message.body)
+          $log.debug "Received Notification#{notification}"
+          if(process(notification))
+            if dry_run
+              $log.info "Notification processed in dry-run mode #{notification}"
+            else
+              notificationRaw.delete()
+              $log.debug "Deleted processed notification #{notification}"
+            end
           else
-            notificationRaw.delete()
-            $log.debug "Deleted processed notification #{notification}"
+            $log.error "Could not process notification, pending... #{notification}"
           end
-        else
-          $log.error "Could not process notification, pending... #{notification}"
-        end
-        sleep @aws_sqs_process_interval
+        }
+        sleep @aws_sqs_process_interval if(@aws_sqs_process_interval > 0)
         @locker.synchronize do
           return unless @running
         end
@@ -163,6 +170,14 @@ class Fluent::ForwardAWSInput < Fluent::Input
           }
         }
         return true
+      rescue => e
+        if(e.message == "Access Denied")
+          $log.warn "Access Denied for key #{notification["path"]}"
+          # Object may have been deleted. Do not retry
+          return true
+        else
+          $log.error e
+        end
       ensure
         tmp.close(true) rescue nil
       end
