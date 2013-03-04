@@ -33,7 +33,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :dry_run, :bool, :default => false
   
   # Not documented parameters. Subject to change in future release
-  config_param :aws_sqs_process_interval, :integer, :default => 1
+  config_param :aws_sqs_process_interval, :integer, :default => 0
   config_param :aws_sqs_monitor_interval, :integer, :default => 10
   config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :start_thread, :bool, :default => true
@@ -107,7 +107,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
         else
           $log.error "Could not process notification, pending... #{notification}"
         end
-        sleep @aws_sqs_process_interval
+        sleep @aws_sqs_process_interval if(@aws_sqs_process_interval > 0)
         @locker.synchronize do
           return unless @running
         end
@@ -163,6 +163,14 @@ class Fluent::ForwardAWSInput < Fluent::Input
           }
         }
         return true
+      rescue => e
+        if(e.message == "Access Denied")
+          $log.warn "Access Denied for key #{notification["path"]}"
+          # Object may have been deleted. Do not retry
+          return true
+        else
+          $log.error e
+        end
       ensure
         tmp.close(true) rescue nil
       end
