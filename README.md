@@ -173,6 +173,9 @@ Use regex to filter channel
 Forward-AWS plugin do not delete buffer objects on S3.  
 Use [S3's lifecycle management](http://docs.aws.amazon.com/AmazonS3/latest/dev/manage-lifecycle-using-console.html) to automatically archive or delete old buffer objects.
 
+### Use long polling
+SQS supports long polling. Just set "Receive Message Wait Time" of SQS queue to 20 seconds
+
 ### How to use buffer objects as raw input
 Each buffer object is msgpack stream object with gzip compression.
 
