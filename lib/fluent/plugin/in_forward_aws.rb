@@ -26,7 +26,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :aws_sqs_endpoint, :string, :default => nil
   config_param :aws_sqs_queue_url, :string, :default => nil
   config_param :aws_sqs_skiptest, :bool, :default => false
-  config_param :aws_sqs_wait_time_seconds,  :integer, :default => 20
+  config_param :aws_sqs_wait_time_seconds,  :integer, :default => 5
   config_param :aws_sqs_limit,              :integer, :default => 10
   config_param :aws_sqs_visibilitiy_timeout,:integer, :default => 300
   
@@ -37,7 +37,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   
   # Not documented parameters. Subject to change in future release
   config_param :aws_sqs_process_interval,   :integer, :default => 0
-  config_param :aws_sqs_monitor_interval,   :integer, :default => 10
+  config_param :aws_sqs_monitor_interval,   :integer, :default => 25
   
   config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :start_thread, :bool, :default => true
@@ -90,23 +90,25 @@ class Fluent::ForwardAWSInput < Fluent::Input
     init_aws_s3_bucket()
     init_aws_sqs_queue()
     if(@start_thread)
-      @thread = Thread.new(&method(:run))
+      @thread = Thread.new(&method(:run)) unless @thread
     end
   end
 
   def run
     @running = true
     while true
-      $log.debug "Polling SQS"
+      $log.debug "Long Polling SQS for #{@aws_sqs_wait_time_seconds} secs with message limit #{@aws_sqs_limit}"
       notificationRaws = @queue.receive_message({
         :limit               => @aws_sqs_limit,
         :wait_time_seconds   => @aws_sqs_wait_time_seconds,
         :visibilitiy_timeout => @aws_sqs_visibilitiy_timeout
       })
+      $log.debug "Polling finished"
       if(notificationRaws && !notificationRaws.instance_of?(Array))
         notificationRaws = [notificationRaws]
       end
       if notificationRaws && notificationRaws.size != 0
+        $log.debug "Received #{notificationRaws.size} messages"
         notificationRaws.each{ |notificationRaw|
           notification = JSON.parse(notificationRaw.as_sns_message.body)
           $log.debug "Received Notification#{notification}"
@@ -121,11 +123,18 @@ class Fluent::ForwardAWSInput < Fluent::Input
             $log.error "Could not process notification, pending... #{notification}"
           end
         }
+        @locker.synchronize do
+          return unless @running
+        end
         sleep @aws_sqs_process_interval if(@aws_sqs_process_interval > 0)
         @locker.synchronize do
           return unless @running
         end
         next
+      end
+      $log.debug "No messages in queue, sleep for #{@aws_sqs_monitor_interval} secs"
+      @locker.synchronize do
+        return unless @running
       end
       sleep @aws_sqs_monitor_interval
       @locker.synchronize do
@@ -197,23 +206,13 @@ class Fluent::ForwardAWSInput < Fluent::Input
     super
     # Stop Thread and join
     @locker.synchronize do
+      $log.debug "Stopping thread"
       @running = false
     end
     if(@thread)
       @thread.run
       @thread.join
       @thread = nil
-    end
-  end
-  
-  private
-  
-  def check_aws_credential
-    unless @aws_access_key_id
-      raise Fluent::ConfigError.new("aws_access_key_id is required")
-    end
-    unless @aws_secret_access_key
-      raise Fluent::ConfigError.new("aws_secret_access_key is required")
     end
   end
   

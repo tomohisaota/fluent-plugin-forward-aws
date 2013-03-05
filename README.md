@@ -126,7 +126,7 @@ Use tag as forward-AWS channel
 aws_sqs_endpoint           | string (required)               | [SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
 aws_sqs_queue_url          | string (required)               | SQS Queue URL (not ARN)
 aws_sqs_skiptest           | bool (default = false)          | Skip SQS Related test at startup
-aws_sqs_wait_time_seconds  | integer(default = 20)           | long polling
+aws_sqs_wait_time_seconds  | integer(default = 5)            | long polling
 aws_sqs_limit              | integer(default = 10)           | The maximum number of messages to receive
 aws_sqs_visibilitiy_timeout| integer(default = 300)          | Duration that the received messages are hidden
 
@@ -179,7 +179,8 @@ Forward-AWS plugin do not delete buffer objects on S3.
 Use [S3's lifecycle management](http://docs.aws.amazon.com/AmazonS3/latest/dev/manage-lifecycle-using-console.html) to automatically archive or delete old buffer objects.
 
 ### SQS long polling
-forward-AWS uses SQS long polling by default
+forward-AWS uses SQS long polling by default. 
+Long polling could slow down fluentd shutdown sequence.
 
 ### How to use buffer objects as raw input
 Each buffer object is msgpack stream object with gzip compression.
