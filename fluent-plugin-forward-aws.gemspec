@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-forward-aws"
-  gem.version       = "0.1.5"
+  gem.version       = "0.1.6"
   gem.authors       = ["Tomohisa Ota"]
   gem.email         = ["tomohisa.ota+github@gmail.com"]
   gem.description   = "Fluentd In/Out plugin to forward log through AWS(S3/SNS/SQS)"
