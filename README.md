@@ -121,11 +121,16 @@ Use tag as forward-AWS channel
 ## In Plugin Configuration
 ### Parameters
 
- name                 | type                            | description
-----------------------|---------------------------------|---------------------------
-aws_sqs_endpoint      | string (required)               | [SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
-aws_sqs_queue_url     | string (required)               | SQS Queue URL (not ARN)
-aws_sqs_skiptest      | bool (default = false)          | Skip SQS Related test at startup
+ name                      | type                            | description
+---------------------------|---------------------------------|---------------------------
+aws_sqs_endpoint           | string (required)               | [SQS Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region) for your topic
+aws_sqs_queue_url          | string (required)               | SQS Queue URL (not ARN)
+aws_sqs_skiptest           | bool (default = false)          | Skip SQS Related test at startup
+aws_sqs_wait_time_seconds  | integer(default = 20)           | long polling
+aws_sqs_limit              | integer(default = 10)           | The maximum number of messages to receive
+aws_sqs_visibilitiy_timeout| integer(default = 300)          | Duration that the received messages are hidden
+
+
 channelEnableRegEx    | bool (default = false)          | Enabled Regular Expression when checking channel
 dry_run               | bool (default = false)          | Do not delete notification after processing
 
@@ -173,8 +178,8 @@ Use regex to filter channel
 Forward-AWS plugin do not delete buffer objects on S3.  
 Use [S3's lifecycle management](http://docs.aws.amazon.com/AmazonS3/latest/dev/manage-lifecycle-using-console.html) to automatically archive or delete old buffer objects.
 
-### Use long polling
-SQS supports long polling. Just set "Receive Message Wait Time" of SQS queue to 20 seconds
+### SQS long polling
+forward-AWS uses SQS long polling by default
 
 ### How to use buffer objects as raw input
 Each buffer object is msgpack stream object with gzip compression.

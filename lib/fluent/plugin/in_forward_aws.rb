@@ -26,6 +26,9 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :aws_sqs_endpoint, :string, :default => nil
   config_param :aws_sqs_queue_url, :string, :default => nil
   config_param :aws_sqs_skiptest, :bool, :default => false
+  config_param :aws_sqs_wait_time_seconds,  :integer, :default => 20
+  config_param :aws_sqs_limit,              :integer, :default => 10
+  config_param :aws_sqs_visibilitiy_timeout,:integer, :default => 300
   
   config_param :add_tag_prefix, :string, :default => nil
   config_param :remove_tag_prefix, :string, :default => nil
@@ -33,9 +36,9 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :dry_run, :bool, :default => false
   
   # Not documented parameters. Subject to change in future release
-  config_param :aws_sqs_process_interval, :integer, :default => 0
-  config_param :aws_sqs_monitor_interval, :integer, :default => 10
-  config_param :aws_sqs_limit,            :integer, :default => 10
+  config_param :aws_sqs_process_interval,   :integer, :default => 0
+  config_param :aws_sqs_monitor_interval,   :integer, :default => 10
+  
   config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
   config_param :start_thread, :bool, :default => true
   
@@ -95,7 +98,11 @@ class Fluent::ForwardAWSInput < Fluent::Input
     @running = true
     while true
       $log.debug "Polling SQS"
-      notificationRaws = @queue.receive_message({:limit => @aws_sqs_limit})
+      notificationRaws = @queue.receive_message({
+        :limit               => @aws_sqs_limit,
+        :wait_time_seconds   => @aws_sqs_wait_time_seconds,
+        :visibilitiy_timeout => @aws_sqs_visibilitiy_timeout
+      })
       if(notificationRaws && !notificationRaws.instance_of?(Array))
         notificationRaws = [notificationRaws]
       end
