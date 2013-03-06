@@ -1,9 +1,20 @@
 class Fluent::ForwardAWSInput < Fluent::Input
   Fluent::Plugin.register_input('forward_aws', self)
   
-  require_relative "forward_aws_util"
-  include ForwardAWSUtil
-    
+  include Fluent::HandleTagNameMixin
+  
+  # Workaround for HandleTagNameMixin bug
+  # https://github.com/fluent/fluentd/pull/109
+  def format_stream(tag, es)
+    out = ''
+    es.each {|time,record|
+      tag_temp = String.new(tag)
+      filter_record(tag_temp, time, record)
+      out << format(tag_temp, time, record)
+    }
+    out
+  end
+     
   def initialize
     super
     require 'aws-sdk'
@@ -29,10 +40,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :aws_sqs_wait_time_seconds,  :integer, :default => 5
   config_param :aws_sqs_limit,              :integer, :default => 10
   config_param :aws_sqs_visibilitiy_timeout,:integer, :default => 300
-  
-  config_param :add_tag_prefix, :string, :default => nil
-  config_param :remove_tag_prefix, :string, :default => nil
-  
+    
   config_param :dry_run, :bool, :default => false
   
   # Not documented parameters. Subject to change in future release
@@ -181,7 +189,8 @@ class Fluent::ForwardAWSInput < Fluent::Input
           streamUnpacker.feed(reader.read())
           streamUnpacker.each {|event|
             (tag, time, record) = event
-            tag = ForwardAWSUtil.filtertag(tag,@add_tag_prefix,@remove_tag_prefix)
+            # Apply HandleTagNameMixin manually
+            filter_record(tag, time, record)
             Fluent::Engine.emit(tag,time,record)
           }
         }

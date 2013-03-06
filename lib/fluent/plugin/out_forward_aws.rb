@@ -1,9 +1,20 @@
 class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   Fluent::Plugin.register_output('forward_aws', self)
   
-  require_relative "forward_aws_util"
-  include ForwardAWSUtil
+  include Fluent::HandleTagNameMixin
     
+  # Workaround for HandleTagNameMixin bug
+  # https://github.com/fluent/fluentd/pull/109
+  def format_stream(tag, es)
+    out = ''
+    es.each {|time,record|
+      tag_temp = String.new(tag)
+      filter_record(tag_temp, time, record)
+      out << format(tag_temp, time, record)
+    }
+    out
+  end
+  
   config_param :channel, :string, :default => "default"
 
   config_param :aws_access_key_id, :string, :default => nil
@@ -16,9 +27,6 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   config_param :aws_sns_endpoint, :string, :default => nil
   config_param :aws_sns_topic_arn, :string, :default => nil
   config_param :aws_sns_skiptest, :bool, :default => false
-
-  config_param :add_tag_prefix, :string, :default => nil
-  config_param :remove_tag_prefix, :string, :default => nil
 
   # Not documented parameters. Subject to change in future release
   config_param :aws_s3_testobjectname, :string, :default => "Config Check Test Object"
@@ -90,7 +98,6 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
   end
 
   def format(tag, time, record)
-    tag = ForwardAWSUtil.filtertag(tag,@add_tag_prefix,@remove_tag_prefix)
     [tag, time, record].to_msgpack
   end
 
@@ -126,7 +133,7 @@ class Fluent::ForwardAWSOutput < Fluent::TimeSlicedOutput
       tmp.close(true) rescue nil
     end
   end
-  
+    
   private
   
   def init_aws_s3_bucket

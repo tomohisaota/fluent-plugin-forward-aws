@@ -74,7 +74,7 @@ class ForwardAWSOutputTest < Test::Unit::TestCase
   end
   
   def test_format_addprefixtest
-    d = create_driver(DUMMYCONFIG + "add_tag_prefix addprefixtest")
+    d = create_driver(DUMMYCONFIG + "add_tag_prefix addprefixtest.")
     time = Time.parse("2011-01-02 13:14:15 UTC").to_i
     d.emit({"a"=>1}, time)
     d.emit({"a"=>2}, time)

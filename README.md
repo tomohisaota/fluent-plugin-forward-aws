@@ -52,9 +52,16 @@ aws_secret_access_key | string (required)               | AWS Secket Access Key
 aws_s3_endpoint       | string (required)               | [s3 Endpoint](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region) for your bucket
 aws_s3_bucketname     | string (required)               | S3 Bucketname
 aws_s3_skiptest       | bool (default = false)          | Skip S3 Related test at startup
-add_tag_prefix        | string (default = nil)          | Add specified prefix to tag before processing log
-remove_tag_prefix     | string (default = nil)          | Remove specified prefix from tag before processing log
 channel               | string (default = "default")    | Tag that Forward-AWS plugin uses for grouping logs.
+
+### Parameters by supported by HandleTagNameMixin
+ name                 | type                            
+----------------------|---------------------
+remove_tag_prefix     | string (default = nil)
+add_tag_prefix        | string (default = nil)
+remove_tag_suffix     | string (default = nil)
+add_tag_suffix        | string (default = nil)
+
 
 ## Out Plugin Configuration
 ### Parameters
