@@ -1,4 +1,4 @@
-# Fluent::Plugin::Forward-AWS
+# Fluent::Plugin::Forward, a plugin for [Fluentd](http://fluentd.org)-AWS
 
 Forward-AWS plugin forwards log through Amazon Web Service.  
 It uses S3 as log storage, and SNS+SQS for notification.  
