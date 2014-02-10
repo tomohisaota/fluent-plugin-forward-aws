@@ -19,4 +19,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency "fluentd"
   gem.add_runtime_dependency "aws-sdk", "~> 1.8.2"
+  
+  gem.add_development_dependency 'rake', '~> 0.9.2.2'
+  gem.add_development_dependency 'rdoc', '~> 3.12'
 end
