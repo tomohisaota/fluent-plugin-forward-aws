@@ -27,9 +27,9 @@ class Fluent::ForwardAWSInput < Fluent::Input
   config_param :channel, :string, :default => "default"
   config_param :channelEnableRegEx, :bool, :default => false
 
-  config_param :aws_access_key_id, :string, :default => nil
-  config_param :aws_secret_access_key, :string, :default => nil
-  
+  config_param :aws_access_key_id, :string, :default => nil, :secret => true
+  config_param :aws_secret_access_key, :string, :default => nil, :secret => true
+
   config_param :aws_s3_endpoint, :string, :default => nil
   config_param :aws_s3_bucketname, :string, :default => nil
   config_param :aws_s3_skiptest, :bool, :default => false
