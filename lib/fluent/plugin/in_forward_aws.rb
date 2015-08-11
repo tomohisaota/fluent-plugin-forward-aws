@@ -191,7 +191,7 @@ class Fluent::ForwardAWSInput < Fluent::Input
             (tag, time, record) = event
             # Apply HandleTagNameMixin manually
             filter_record(tag, time, record)
-            Fluent::Engine.emit(tag,time,record)
+            router.emit(tag,time,record)
           }
         }
         return true
