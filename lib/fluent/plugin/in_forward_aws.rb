@@ -56,12 +56,6 @@ class Fluent::ForwardAWSInput < Fluent::Input
     if /^\s*$/ =~ @channel
       raise Fluent::ConfigError.new("channel is invalid. Exp=[\w]+")
     end
-    unless @aws_access_key_id
-      raise Fluent::ConfigError.new("aws_access_key_id is required")
-    end
-    unless @aws_secret_access_key
-      raise Fluent::ConfigError.new("aws_secret_access_key is required")
-    end
     unless @aws_s3_endpoint
       raise Fluent::ConfigError.new("aws_s3_endpoint is required")
     end
@@ -230,8 +224,8 @@ class Fluent::ForwardAWSInput < Fluent::Input
   def init_aws_s3_bucket
     unless @bucket
       options = {}
-      options[:access_key_id]      = @aws_access_key_id
-      options[:secret_access_key]  = @aws_secret_access_key
+      options[:access_key_id]      = @aws_access_key_id if @aws_access_key_id
+      options[:secret_access_key]  = @aws_secret_access_key if @aws_secret_access_key
       options[:s3_endpoint]        = @aws_s3_endpoint
       options[:use_ssl]            = true
       s3 = AWS::S3.new(options)
@@ -242,8 +236,8 @@ class Fluent::ForwardAWSInput < Fluent::Input
   def init_aws_sqs_queue
     unless @queue
       options = {}
-      options[:access_key_id]      = @aws_access_key_id
-      options[:secret_access_key]  = @aws_secret_access_key
+      options[:access_key_id]      = @aws_access_key_id if @aws_access_key_id
+      options[:secret_access_key]  = @aws_secret_access_key if @aws_secret_access_key
       options[:sqs_endpoint]       = @aws_sqs_endpoint
       sqs = AWS::SQS.new(options)
       @queue = sqs.queues[@aws_sqs_queue_url]
